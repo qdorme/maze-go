@@ -3,7 +3,6 @@ package maze
 import (
 	"bytes"
 	"image"
-	"log/slog"
 )
 
 func (m *Maze) Start() chan image.Image {
@@ -27,7 +26,6 @@ func (m *Maze) Start() chan image.Image {
 				if !open {
 					break
 				}
-				slog.Info("sending maze")
 				buffer := new(bytes.Buffer)
 				RenderMaze(&mazeUpdate, buffer)
 				decode, _, err := image.Decode(bytes.NewReader(buffer.Bytes()))
@@ -36,7 +34,6 @@ func (m *Maze) Start() chan image.Image {
 				}
 
 				img <- decode
-
 			}
 		}
 	}()

@@ -1,9 +1,8 @@
 package maze
 
 import (
-	"fmt"
 	"log/slog"
-	"math/rand"
+	"math/rand/v2"
 )
 
 type Maze struct {
@@ -55,8 +54,8 @@ func (m *Maze) Create(sig chan Maze) {
 		Cells: make([]Cell, m.Width*m.Height),
 		Index: -1,
 	}
-	// start with 0,0
-	cell := stack.Push(Cell{0, 0})
+	// start at random cell
+	cell := stack.Push(Cell{rand.IntN(m.Height), rand.IntN(m.Width)})
 	m.visiteCell(cell)
 	for {
 		err := m.chooseNeighbour(&stack)
@@ -84,7 +83,7 @@ popAgain:
 		goto popAgain
 	}
 
-	randomIndex := rand.Intn(len(neighbours))
+	randomIndex := rand.IntN(len(neighbours))
 	stack.Push(cell)
 	stack.Push(neighbours[randomIndex])
 	return nil
@@ -166,8 +165,6 @@ func (m *Maze) FindExit(sig chan Maze) {
 		}
 	}
 	m.Exit = append(m.Exit, exit)
-	slog.Info(fmt.Sprintf("exit found at (%d,%d)", exit.X, exit.Y))
-
 }
 
 func (m *Maze) FindConnected(cells []Cell) []Cell {
@@ -220,7 +217,7 @@ func linkCells(m *Maze, stack *Stack) {
 		slog.Error(err.Error())
 		return
 	}
-	// slog.Info(fmt.Sprintf("linking cell (%d,%d) with cell (%d,%d)", cell.X, cell.Y, newCell.X, newCell.Y))
+
 	m.visiteCell(newCell)
 	if cell.X == newCell.X {
 		if cell.Y == newCell.Y-1 {
