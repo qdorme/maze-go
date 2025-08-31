@@ -55,7 +55,7 @@ func (m *Maze) Create(sig chan Maze) {
 		Index: -1,
 	}
 	// start at random cell
-	cell := stack.Push(Cell{rand.IntN(m.Height), rand.IntN(m.Width)})
+	cell := stack.Push(Cell{rand.IntN(m.Width), rand.IntN(m.Height)})
 	m.visiteCell(cell)
 	for {
 		err := m.chooseNeighbour(&stack)
