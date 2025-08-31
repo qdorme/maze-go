@@ -1,8 +1,14 @@
 package maze
 
-func (m *Maze) Start() chan Maze {
+import (
+	"bytes"
+	"image"
+	"log/slog"
+)
 
-	signal := make(chan Maze, 100)
+func (m *Maze) Start() chan image.Image {
+
+	signal := make(chan Maze, 10)
 
 	go func() {
 		m.Create(signal)
@@ -12,5 +18,28 @@ func (m *Maze) Start() chan Maze {
 		close(signal)
 	}()
 
-	return signal
+	img := make(chan image.Image, 100)
+
+	go func() {
+		for {
+			select {
+			case mazeUpdate, open := <-signal:
+				if !open {
+					break
+				}
+				slog.Info("sending maze")
+				buffer := new(bytes.Buffer)
+				RenderMaze(&mazeUpdate, buffer)
+				decode, _, err := image.Decode(bytes.NewReader(buffer.Bytes()))
+				if err != nil {
+					return
+				}
+
+				img <- decode
+
+			}
+		}
+	}()
+
+	return img
 }
